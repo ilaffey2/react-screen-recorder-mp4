@@ -1,0 +1,17 @@
+{
+  "name": "react-screen-record-mp4",
+  "version": "1.0.0",
+  "description": ":/ ",
+  "main": "index.js",
+  "author": "ian <ian.laffey@mail.mcgill.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.11.6",
+    "buffer": "^6.0.3",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.0.35"
+  }
+}
