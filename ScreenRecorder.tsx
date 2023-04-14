@@ -1,5 +1,6 @@
 // components/ScreenRecorder.tsx
 
+import axios from "axios";
 import React, { useState } from "react";
 
 interface ScreenRecorderProps {
@@ -46,31 +47,40 @@ const ScreenRecorder: React.FC<ScreenRecorderProps> = ({ canvasRef }) => {
       const webmBuffer = await webmBlob.arrayBuffer();
       const webmBase64 = Buffer.from(webmBuffer).toString("base64");
 
-      const response = await fetch("/api/convert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ webm: webmBase64 }),
-      });
+      try {
+        const response = await axios.post(
+          "/api/convert",
+          {
+            webm: webmBase64,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-      if (response.ok) {
-        const { mp4: mp4Base64 } = await response.json();
-        const mp4Blob = new Blob([Buffer.from(mp4Base64, "base64")], {
-          type: "video/mp4",
-        });
+        if (response.status === 200) {
+          const { mp4: mp4Base64 } = response.data;
+          const mp4Blob = new Blob([Buffer.from(mp4Base64, "base64")], {
+            type: "video/mp4",
+          });
 
-        const url = window.URL.createObjectURL(mp4Blob);
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = "element-recording.mp4";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          setRecordedBlobs([]);
-        }, 100);
-      } else {
+          const url = window.URL.createObjectURL(mp4Blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = "element-recording.mp4";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            setRecordedBlobs([]);
+          }, 100);
+        } else {
+          alert("Failed to convert the video");
+        }
+      } catch (error) {
+        console.error(error);
         alert("Failed to convert the video");
       }
     }
